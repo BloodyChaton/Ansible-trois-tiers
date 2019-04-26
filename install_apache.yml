@@ -1,0 +1,17 @@
+---
+- hosts: web
+  become: yes
+  tasks:
+  - name: Install Apache
+    yum: name=httpd state=present
+  - name: Ensure Apache is running
+    service: name=httpd state=started enabled=yes
+  - name: Open port 80 for http access
+    firewalld:
+      service: http
+      permanent: true
+      state: enabled
+  - name: Restart the firewalld service to load in the firewall changes
+    service: 
+      name: firewalld 
+      state: restarted
