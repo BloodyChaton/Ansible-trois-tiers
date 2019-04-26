@@ -1,0 +1,10 @@
+---
+# tasks file for tomcat-ansible-role
+- name : Install MariaDB
+  import_playbook : install_mariadb.yml
+
+- name : Install tomcat
+  import_playbook : install_tomcat.yml
+
+- name : Install apache
+  import_playbook : install_apache.yml
