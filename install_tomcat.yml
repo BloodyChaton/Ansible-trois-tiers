@@ -14,8 +14,16 @@
   - name: tomcat | user add
     user: name=tomcat group=tomcat home=/opt/tomcat8 createhome=no  
 
+  - name: tomcat| test if binary already exists
+    stat: 
+      path: /tmp/apache-tomcat-8.5.40.tar.gz
+    register: binarydl
+
   - name: tomcat | binary download
-    get_url: url="http://mirror.nus.edu.sg/apache/tomcat/tomcat-8/v8.5.40/bin/apache-tomcat-8.5.40.tar.gz"  dest="/tmp"
+    get_url: 
+      url: "http://mirror.nus.edu.sg/apache/tomcat/tomcat-8/v8.5.40/bin/apache-tomcat-8.5.40.tar.gz"
+      dest: "/tmp"
+    when: binarydl.stat.exists == False
 
   - name: tomcat  | extract archive
     shell: "tar xzf /tmp/apache-tomcat-8.5.40.tar.gz -C /opt"
@@ -23,7 +31,7 @@
   - name: tomcat  | symlink install directory
     file: src="/opt/apache-tomcat-8.5.40" path="/opt/tomcat8" state=link
     
-  - name: tomcat  |   change ownership of target installation
+  - name: tomcat  | change ownership of target installation
     file: path="/opt/tomcat8" owner=tomcat group=tomcat state=directory recurse=yes
 
   - name : tomcat | run tomcat as a service
@@ -37,7 +45,23 @@
   - name : tomcat | copy local file to remote
     copy : 
        src: sample.war
-       dest: /opt/tomcat8/webapps 
+       dest: /opt/tomcat8/webapps
+       owner: tomcat
+       group: tomcat
+       mode: u=rwx,g=rx,o=r
 
-  #- name: tomcat | deploy the sample.war
-  #  get_url: url="https://tomcat.apache.org/tomcat-7.0-doc/appdev/sample/sample.war" dest="/opt/apache-tomcat-8.5.40/webapps"
+  - name : Ensure application is deployed
+    stat:
+       path : /opt/tomcat8/webapps/sample
+
+  - name : Check that you can connect before continue playbook
+    uri:
+       url: http://localhost:8080/sample/index.html
+    register: result
+    until: result.status == 200
+    retries: 10
+    delay : 10
+
+  - name : Show result variable
+    debug: 
+      var: result
