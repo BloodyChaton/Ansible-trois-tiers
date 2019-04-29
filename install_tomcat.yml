@@ -1,20 +1,29 @@
 ---
-- hosts: app
+- name: Tomcat app server
+  hosts: app
   become: yes
   tasks:
-    - name: Install Java 1.7
-      yum: name=java-1.7.0-openjdk state=present
+  - name: Ensure Java is installed.
+    package:
+      name: "java-1.8.0-openjdk"
+      state: present
 
-    - name: add group "tomcat"
-      group: name=tomcat
+  - name: tomcat | group add
+    group: name=tomcat
 
-    - name: add user "tomcat"
-      user: name=tomcat group=tomcat home=/usr/share/tomcat createhome=no
-      become: True
-      become_method: sudo
+  - name: tomcat | user add
+    user: name=tomcat group=tomcat home=/opt/tomcat createhome=no
+    
 
-    - name: Download Tomcat
-      get_url: url=http://archive.apache.org/dist/tomcat/tomcat-7/v7.0.61/bin/apache-tomcat-7.0.61.tar.gz dest=/opt/apache-tomcat-7.0.61.tar.gz
+  - name: tomcat | binary download
+    get_url: url="http://mirror.nus.edu.sg/apache/tomcat/tomcat-8/v8.5.40/bin/apache-tomcat-8.5.40.tar.gz"  dest="/tmp"
+    
 
-    - name: Extract archive
-      command: chdir=/usr/share /bin/tar xvf /opt/apache-tomcat-7.0.61.tar.gz -C /opt/ creates=/opt/apache-tomcat-7.0.61
+  - name: tomcat  | extract archive
+    shell: "tar xzf /tmp/apache-tomcat-8.5.40.tar.gz -C /opt"
+
+  - name: tomcat  | symlink install directory
+    file: src="/opt/apache-tomcat-8.5.40" path="/opt/tomcat8" state=link
+    
+  - name: tomcat  |   change ownership of target installation
+    file: path="/opt/tomcat8" owner=tomcat group=tomcat state=directory recurse=yes
