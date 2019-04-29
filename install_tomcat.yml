@@ -12,12 +12,10 @@
     group: name=tomcat
 
   - name: tomcat | user add
-    user: name=tomcat group=tomcat home=/opt/tomcat createhome=no
-    
+    user: name=tomcat group=tomcat home=/opt/tomcat8 createhome=no  
 
   - name: tomcat | binary download
     get_url: url="http://mirror.nus.edu.sg/apache/tomcat/tomcat-8/v8.5.40/bin/apache-tomcat-8.5.40.tar.gz"  dest="/tmp"
-    
 
   - name: tomcat  | extract archive
     shell: "tar xzf /tmp/apache-tomcat-8.5.40.tar.gz -C /opt"
@@ -27,3 +25,19 @@
     
   - name: tomcat  |   change ownership of target installation
     file: path="/opt/tomcat8" owner=tomcat group=tomcat state=directory recurse=yes
+
+  - name : tomcat | run tomcat as a service
+    template : src=tomcat.service.j2 dest=/etc/systemd/system/tomcat.service
+
+  - name : tomcat | restart
+    service :
+      name: tomcat
+      state: restarted
+
+  - name : tomcat | copy local file to remote
+    copy : 
+       src: sample.war
+       dest: /opt/tomcat8/webapps 
+
+  #- name: tomcat | deploy the sample.war
+  #  get_url: url="https://tomcat.apache.org/tomcat-7.0-doc/appdev/sample/sample.war" dest="/opt/apache-tomcat-8.5.40/webapps"

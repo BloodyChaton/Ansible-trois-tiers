@@ -1,0 +1,20 @@
+[Unit]
+Description=tomcat
+After=network.target
+
+[Service]
+Type=forking
+User=tomcat
+Group=tomcat
+
+Environment=CATALINA_PID=/opt/tomcat8/tomcat.pid
+Environment=TOMCAT_JAVA_HOME=/usr/java/default
+Environment=CATALINA_HOME=/opt/tomcat8
+Environment=CATALINA_BASE=/opt/tomcat8
+
+
+ExecStart=/opt/tomcat8/bin/startup.sh
+ExecStop=/bin/kill -15 $MAINPID
+
+[Install]
+WantedBy=multi-user.target
