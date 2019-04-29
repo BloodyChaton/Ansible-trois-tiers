@@ -33,9 +33,14 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     app.vm.hostname = "tp-app.dev"
   # static ip address
     app.vm.network :private_network, ip: "192.168.60.8"
-    app.vm.provision "ansible" do |ansible|
+    app.vm.provision "install_tomcat", type: "ansible" do |ansible|
       ansible.inventory_path = "./inventory"
       ansible.playbook = "./install_tomcat.yml"
+      ansible.limit = "app"
+    end
+    app.vm.provision "install_sampleapp", type: "ansible" do |ansible|
+      ansible.inventory_path = "./inventory"
+      ansible.playbook = "./install_sampleapp.yml"
       ansible.limit = "app"
     end  
   end

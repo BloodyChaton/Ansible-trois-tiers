@@ -15,3 +15,35 @@
     service: 
       name: firewalld 
       state: restarted
+
+  - name: install mod_jk
+    copy : 
+       src: mod_jk.so
+       dest: /etc/httpd/modules
+       mode: u=rwx,g=rx,o=r
+
+  - name: configure httpd to accept mod_jk
+    copy : 
+       src: httpd.conf
+       dest: /etc/httpd/conf/
+       mode: u=rwx,g=rx,o=r
+
+  - name: configure workers.properties
+    copy : 
+       src: workers.properties
+       dest: /etc/httpd/conf/
+       mode: u=rwx,g=rx,o=r
+
+  - name: create directory
+    shell: mkdir -p /var/run/mod_jk
+  - name : Affect users to new directory
+    shell: chown apache:apache /var/run/mod_jk
+  - name : Affect users to new directory
+    copy: 
+      src: app1.conf
+      dest: /etc/httpd/conf.d
+      mode: u=rwx,g=rx,o=r
+  - name : Desactivate Linux security
+    shell: setenforce 0
+
+
