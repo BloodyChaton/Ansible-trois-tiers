@@ -1,16 +1,3 @@
----
-<<<<<<< HEAD
-# tasks file for tomcat-ansible-role
-- name : Install MariaDB
-  import_playbook : install_mariadb.yml
-
-- name : Install tomcat
-  import_playbook : install_tomcat.yml
-
-- name : Install apache
-  import_playbook : install_apache.yml
-=======
 # file: site.yml
--import_playbook: webservers.yml
--import_playbook: appservers.yml
->>>>>>> 18be5e4cade0e7df4ad0990b7d831b9b497d8b8e
+- import_playbook: webservers.yml
+- import_playbook: appservers.yml
